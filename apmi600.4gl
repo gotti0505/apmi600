@@ -109,7 +109,7 @@
 
 DATABASE ds
 
-#GLOBALS "../../config/top.global" #111024 by gotti mark
+#GLOBALS "../../config/top.global" #111024 by gotti mark test
 GLOBALS "../../../tiptop/config/top.global" #111024 by gotti add
 #GLOBALS "../../sub/4gl/s_data_center.global"   #No.FUN-820034 111024 by gotti mark
 GLOBALS "../../../tiptop/sub/4gl/s_data_center.global"   #111024 by gotti add
@@ -219,18 +219,18 @@ MAIN
    LET g_sql = " pmcacti.pmc_file.pmcacti,",
                " pmc01.pmc_file.pmc01,",
                " pmc03.pmc_file.pmc03,",
-               " pmc30.pmc_file.pmc30,",
-               " pmc06.pmc_file.pmc06,",
-               " pmc07.pmc_file.pmc07,",
-               " pmc908.pmc_file.pmc908,",
+               " pmc081.pmc_file.pmc081,",
+               " pmc24.pmc_file.pmc24,",
+               " pmcud02.pmc_file.pmcud02,",
                " pmc10.pmc_file.pmc10,",
                " pmc11.pmc_file.pmc11,",
                " pmc091.pmc_file.pmc091,",
-               " pmc092.pmc_file.pmc092,",
-               " pmc093.pmc_file.pmc093,",
-               " pmc094.pmc_file.pmc094,",
-               " pmc095.pmc_file.pmc095,",
-               " pmc04.pmc_file.pmc04 "
+               " pmc52.pmc_file.pmc52,",
+               " pmf02.pmf_file.pmf02,",
+               " pmf03.pmf_file.pmf03,",
+               " pmf08.pmf_file.pmf08,",
+               " pmf09.pmf_file.pmf09,",
+               " nmt02.nmt_file.nmt02 "
    LET l_table = cl_prt_temptable('apmi600',g_sql) CLIPPED
    IF  l_table = -1 THEN EXIT PROGRAM END IF
    LET g_sql = "INSERT INTO ",g_cr_db_str CLIPPED,l_table CLIPPED,
@@ -3429,6 +3429,11 @@ END FUNCTION
 FUNCTION i600_out()
    DEFINE   l_i      LIKE type_file.num5,    #No.FUN-680136 SMALLINT
             sr       RECORD LIKE pmc_file.*,
+            l_pmf02  LIKE pmf_file.pmf02,
+            l_pmf03  LIKE pmf_file.pmf03,
+            l_pmf08  LIKE pmf_file.pmf08,
+            l_pmf09  LIKE pmf_file.pmf09,
+            l_nmt02  LIKE nmt_file.nmt02,
             l_name   LIKE type_file.chr20,                 # External(Disk) file name  #No.FUN-680136 VARCHAR(20)
             l_za05   LIKE type_file.chr1000,               #  #No.FUN-680136 VARCHAR(40)
             l_chr    LIKE type_file.chr1    #No.FUN-680136 VARCHAR(1)
@@ -3481,11 +3486,15 @@ FUNCTION i600_out()
      #       CALL cl_itemname_by_lang("pmc_file","pmc03",g_pmc.pmc01,g_lang,g_pmc.pmc03) RETURNING g_pmc.pmc03
      #    END IF
       END IF
+      SELECT pmf02,pmf03,pmf08,pmf09 INTO l_pmf02,l_pmf03,l_pmf08,l_pmf09
+      FROM pmf_file
+      WHERE pmf01=sr.pmc01
+      SELECT nmt02 INTO l_nmt02 FROM nmt_file WHERE nmt01= l_pmf02
 #No:FUN-840052---Begin
 #      OUTPUT TO REPORT i600_rep(sr.*)
-       EXECUTE insert_prep USING  sr.pmcacti, sr.pmc01, sr.pmc03, sr.pmc30, sr.pmc06, sr.pmc07,
-                                  sr.pmc908,  sr.pmc10, sr.pmc11, sr.pmc091,sr.pmc092,sr.pmc093,
-                                  sr.pmc094,sr.pmc095,sr.pmc04
+       EXECUTE insert_prep USING  sr.pmcacti, sr.pmc01, sr.pmc03, sr.pmc081, sr.pmc24, sr.pmcud02,
+                                  sr.pmc10,  sr.pmc11, sr.pmc091, sr.pmc52,l_pmf02,l_pmf03,
+                                  l_pmf08,l_pmf09,l_nmt02
    END FOREACH
 
 #  FINISH REPORT i600_rep
